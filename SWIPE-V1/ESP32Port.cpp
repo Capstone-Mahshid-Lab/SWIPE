@@ -75,15 +75,3 @@ void SPI_LoopbackTest(void) {
     Serial.println();
 }
 
-
-uint16_t ReadDeviceID(void) {
-    AD5940_HWReset();
-    AD5940_CsClr();  // Pull CS low
-    uint8_t cmd[2] = {0x00, 0x00};  // Replace with correct read command
-    uint8_t response[2] = {0};
-    vspi->transfer(cmd, 2);         // Send read command
-    response[0] = vspi->transfer(0x00);  // Clock out response
-    response[1] = vspi->transfer(0x00);  // Clock out response
-    AD5940_CsSet();  // Pull CS high
-    Serial.println((response[0] << 8) | response[1]);  // Combine bytes
-}

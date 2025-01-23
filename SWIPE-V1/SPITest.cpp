@@ -1,9 +1,8 @@
 #include "SPITest.hpp"
 
 void runSpiTest(void) {
-  //SPI_RawTest();
-  SPI_RW_REG();
-  // SPI_RW_TEMPERATURE();
+  //SPI_RW_REG();
+  SPI_RW_TEMPERATURE();
 }
 
 static int32_t AD5940PlatformCfg2(void){
@@ -68,9 +67,7 @@ void _ad5940_analog_init2(void) {
 void SPI_RW_TEMPERATURE(void) {
     AD5940_HWReset();
     AD5940_Initialize();
-    Serial.println("run platform config");
     AD5940PlatformCfg2();
-    Serial.println("run analog init 2");
     _ad5940_analog_init2();
 
     // Enable temperature sensor and start ADC conversion
@@ -79,46 +76,25 @@ void SPI_RW_TEMPERATURE(void) {
                     (1 << BITP_AFE_AFECON_TEMPSENSEN)   | 
                     (1 << BITP_AFE_AFECON_ADCCONVEN)    |
                     (1 << BITP_AFE_AFECON_ADCEN);
-    Serial.println("run WriteReg");
     AD5940_WriteReg(REG_AFE_AFECON, mask);
 
     // Wait for ADC conversion to complete
     delayMicroseconds(200); // Adjust delay as per datasheet timing specs
 
     // Read AFECON register to verify settings
-    uint32_t afecon_val = AD5940_ReadReg(REG_AFE_AFECON);
-    if (!(afecon_val & mask)) {
-        Serial.println("Error: AFECON settings not applied.");
-        return;
-    }
-    Serial.print("AFECON register value: ");
-    Serial.println(afecon_val, HEX);
+    // uint32_t afecon_val = AD5940_ReadReg(REG_AFE_AFECON);
+    // if (!(afecon_val & mask)) {
+    //     Serial.println("Error: AFECON settings not applied.");
+    //     return;
+    // }
+    // Serial.print("AFECON register value: ");
+    // Serial.println(afecon_val, HEX);
 
     // Read temperature sensor result
     uint32_t temp_result = AD5940_ReadAfeResult(AFERESULT_TEMPSENSOR);
     Serial.print("Temperature sensor result: ");
-    Serial.println(temp_result);
+    Serial.println(temp_result/8.13f/1.5f-273.15f);
 }
-
-void SPI_RawTest(void) {
-    uint8_t tx_buffer[3] = {0x00, 0x00, REG_AFECON_ADIID};  // Command to read register 0x00
-    uint8_t rx_buffer[3] = {0};
-
-    // Pull CS low and send command
-    AD5940_CsClr();
-    AD5940_ReadWriteNBytes(tx_buffer, rx_buffer, 3);
-    AD5940_CsSet();
-
-    // Display received data
-    Serial.print("Raw SPI response: ");
-    for (int i = 0; i < 3; i++) {
-        Serial.print(rx_buffer[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
-}
-
-
 
 void SPI_RW_REG(void) {
     AD5940_HWReset();
@@ -131,19 +107,4 @@ void SPI_RW_REG(void) {
     Serial.print("Device ID: ");
     Serial.println(device_id, HEX);
 
-    // // Enable temperature sensor and start ADC conversion
-    // uint32_t mask = 3;
-    // Serial.println("run WriteReg");
-    // AD5940_WriteReg(REG_AFE_AFECON, mask);
-
-    // // Wait for ADC conversion to complete
-    // delayMicroseconds(300); // Adjust delay as per datasheet timing specs
-
-    // // Read AFECON register to verify settings
-    // uint32_t afecon_val = AD5940_ReadReg(REG_AFE_AFECON);
-    // if (!(afecon_val & mask)) {
-    //     Serial.println("Error: AFECON settings not applied.");
-    // }
-    // Serial.print("AFECON register value: ");
-    // Serial.println(afecon_val, HEX);
 }

@@ -21,7 +21,6 @@ uint32_t  AD5940_ClrMCUIntFlag(void) {
 }
 
 void setup() {
-  // put your setup code here, to run once:
   //attachInterrupt(digitalPinToInterrupt(INT_PIN), handleISR, CHANGE);
   pinMode(BLE_LED, OUTPUT);
   digitalWrite(BLE_LED, LOW);
@@ -32,13 +31,10 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   Serial.println("hello from arduino");
-  //ReadDeviceID();
   //SPI_LoopbackTest();
   runSpiTest();
   //getTemperature();
-  //AD5940_HWReset();
   digitalWrite(BLE_LED, HIGH);
   delay(500);
   digitalWrite(BLE_LED, LOW);

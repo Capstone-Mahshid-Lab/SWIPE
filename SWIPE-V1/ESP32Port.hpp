@@ -19,7 +19,6 @@ static const int spiClk = 1000000;  // 1 MHz
 void init_ESP32_SPI(void);
 
 void SPI_LoopbackTest(void);
-uint16_t ReadDeviceID(void);
 
 #endif
 
