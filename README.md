@@ -36,8 +36,9 @@ Follow these steps to set up the SWIPE environment:
 
 ### 4. Compile and Flash the Code  
 1. Open the SWIPE code in the Arduino IDE.  
-2. Click the **"Upload"** button (top-left corner) to compile and flash the code onto the board.  
-
+2. Make sure that ESP32 Wrover kit is selected and the right COM port is selected.
+3. Click the **"Upload"** button (top-left corner) to compile and flash the code onto the board.  
+   ![Configuration to have in Arduino IDE](assets/Selecting_ESP32_Wrover_kit.jpg)
 ---
 
 ### 5. Read Data from the COM Port  
