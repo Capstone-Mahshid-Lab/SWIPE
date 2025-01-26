@@ -1,6 +1,7 @@
 #include "SPITest.hpp"
 #include "ESP32Port.hpp"
 //#include "TemperatureService.hpp"
+#include "CVService.hpp"
 
 #define INT_PIN 17
 #define BLE_LED 21
@@ -33,8 +34,9 @@ void setup() {
 void loop() {
   Serial.println("hello from arduino");
   //SPI_LoopbackTest();
-  runSpiTest();
+  //runSpiTest();
   //getTemperature();
+  runCV();
   digitalWrite(BLE_LED, HIGH);
   delay(500);
   digitalWrite(BLE_LED, LOW);

@@ -924,6 +924,22 @@ AD5940Err AppRAMPISR(void *pBuff, uint32_t *pCount)
     return 0;
     }
 
+void getCVData(void *pBuff) {
+    uint32_t FifoCnt = AD5940_FIFOGetCnt();
+    
+    AD5940_FIFORd((uint32_t *)pBuff, FifoCnt);
+    /* Process data */
+    AppRAMPDataProcess((int32_t *)pBuff, &FifoCnt);
+    AppRAMPCtrl(APPCTRL_STOPNOW, 0);    /* Stop the Wakeup Timer. */
+                
+    /* Reset variables so measurement can be restarted*/
+    AppRAMPCfg.bTestFinished = bTRUE;
+    AppRAMPCfg.RampState = RAMP_STATE0;
+    AppRAMPCfg.bFirstDACSeq = bTRUE;
+    AppRAMPCfg.bDACCodeInc = bTRUE;
+    AppRAMPSeqDACCtrlGen();
+}
+
 /**
  * @}
  * @}
