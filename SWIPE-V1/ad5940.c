@@ -77,7 +77,7 @@ static void AD5940_D2DWriteReg(uint16_t RegAddr, uint32_t RegData);
  *            @{
 */
 
-//#define SEQUENCE_GENERATOR  /*!< Build sequence generator part in to lib. Comment this line to remove this feature  */
+#define SEQUENCE_GENERATOR  /*!< Build sequence generator part in to lib. Comment this line to remove this feature  */
 
 #ifdef SEQUENCE_GENERATOR
 /**
