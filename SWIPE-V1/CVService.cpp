@@ -63,7 +63,7 @@ static int32_t AD5940PlatformCfg(void)
   return 0;
 }
 
-void AD5940RampStructInit(void)
+static void AD5940RampStructInit(void)
 {
   AppRAMPCfg_Type *pRampCfg;
   
@@ -81,8 +81,8 @@ void AD5940RampStructInit(void)
   pRampCfg->RampPeakVolt = +1000.0f;           /* +1V */
   pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
   pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
-  pRampCfg->StepNumber = 800;                   /* Total steps. Equals to ADC sample number */
-  pRampCfg->RampDuration = 24*1000;            /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
+  pRampCfg->StepNumber = 16;                   /* Total steps. Equals to ADC sample number */
+  pRampCfg->RampDuration = 125;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
   pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
   pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
