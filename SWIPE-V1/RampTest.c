@@ -925,12 +925,16 @@ AD5940Err AppRAMPISR(void *pBuff, uint32_t *pCount)
     }
 
 void getCVData(void *pBuff) {
+    if(AD5940_WakeUp(10) > 10)  /* Wakeup AFE by read register, read 10 times at most */
+        return AD5940ERR_WAKEUP;  /* Wakeup Failed */
+    AD5940_SleepKeyCtrlS(SLPKEY_LOCK);
+
     uint32_t FifoCnt = AD5940_FIFOGetCnt();
     
     AD5940_FIFORd((uint32_t *)pBuff, FifoCnt);
     /* Process data */
     AppRAMPDataProcess((int32_t *)pBuff, &FifoCnt);
-    AppRAMPCtrl(APPCTRL_STOPNOW, 0);    /* Stop the Wakeup Timer. */
+    AppRAMPCtrl(APPCTRL_STOPSYNC, 0);    /* Stop the Wakeup Timer. */
                 
     /* Reset variables so measurement can be restarted*/
     AppRAMPCfg.bTestFinished = bTRUE;

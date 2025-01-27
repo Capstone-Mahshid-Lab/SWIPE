@@ -82,7 +82,7 @@ static void AD5940RampStructInit(void)
   pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
   pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
   pRampCfg->StepNumber = 16;                   /* Total steps. Equals to ADC sample number */
-  pRampCfg->RampDuration = 125;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
+  pRampCfg->RampDuration = 240;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
   pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
   pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
@@ -111,8 +111,12 @@ void runCV(void) {
     AppRAMPCtrl(APPCTRL_START, 0);   
 
     AppRAMPGetCfg(&pRampCfg);
+    while (digitalRead(17) == 1) {
+      delay(1);
+    }
     getCVData(AppBuff);
     RampShowResult((float*)AppBuff, APPBUFF_SIZE);
+    delay(10);
 }
 
 

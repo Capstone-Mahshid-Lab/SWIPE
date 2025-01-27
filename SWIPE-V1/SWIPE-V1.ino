@@ -25,6 +25,7 @@ void setup() {
   //attachInterrupt(digitalPinToInterrupt(INT_PIN), handleISR, CHANGE);
   pinMode(BLE_LED, OUTPUT);
   digitalWrite(BLE_LED, LOW);
+  pinMode(INT_PIN, INPUT);
   Serial.begin(115200);
   Serial.println("running setup");
   init_ESP32_SPI();
