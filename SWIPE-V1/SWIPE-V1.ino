@@ -1,5 +1,6 @@
 #include "SPITest.hpp"
 #include "ESP32Port.hpp"
+#include "AD5940Main.h"
 //#include "TemperatureService.hpp"
 
 #define INT_PIN 17
@@ -21,7 +22,7 @@ uint32_t  AD5940_ClrMCUIntFlag(void) {
 }
 
 void setup() {
-  //attachInterrupt(digitalPinToInterrupt(INT_PIN), handleISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(INT_PIN), handleISR, CHANGE);
   pinMode(BLE_LED, OUTPUT);
   digitalWrite(BLE_LED, LOW);
   Serial.begin(115200);
@@ -33,8 +34,9 @@ void setup() {
 void loop() {
   Serial.println("hello from arduino");
   //SPI_LoopbackTest();
-  runSpiTest();
+  // runSpiTest();
   //getTemperature();
+  AD5940_Main();
   digitalWrite(BLE_LED, HIGH);
   delay(500);
   digitalWrite(BLE_LED, LOW);
