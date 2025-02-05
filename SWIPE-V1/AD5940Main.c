@@ -13,6 +13,7 @@ Analog Devices Software License Agreement.
 
 *****************************************************************************/
 #include "RampTest.h"
+#include "ad5940.h"
 
 /**
    User could configure following parameters
@@ -146,12 +147,17 @@ void AD5940_Main(void)
   AD5940PlatformCfg();
   AD5940RampStructInit();
 
-  AppRAMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
-  AppRAMPCtrl(APPCTRL_START, 0);          /* Control IMP measurement to start. Second parameter has no meaning with this command. */
+  AD5940Err error1 =AppRAMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
+  printf("AppRAMPInit returned error code: %d\n", error1);
+  AppRAMPCtrl(APPCTRL_START, 0);
+  AD5940Err error2 = AppRAMPCtrl(APPCTRL_START, 0);          /* Control IMP measurement to start. Second parameter has no meaning with this command. */
+  printf("AppRAMPCtrl returned error code: %d\n", error2);
 
+  printf("test\n");
   while(1)
   {
-		AppRAMPGetCfg(&pRampCfg);
+    AD5940Err error3 = AppRAMPGetCfg(&pRampCfg);
+    // printf("AppRAMPGetCfg returned error code: %d\n", error3);  
     // printf("PK looping\n");
     if(AD5940_GetMCUIntFlag())
     {
@@ -164,7 +170,7 @@ void AD5940_Main(void)
 		/* Repeat Measurement continuously*/
 		if(pRampCfg->bTestFinished ==bTRUE)
 		{
-      printf("PK finished\n");
+      printf("finishedddddddddddddddddddddddddd\n");
 			AD5940_Delay10us(200000);
 			pRampCfg->bTestFinished = bFALSE;
 			AD5940_SEQCtrlS(bTRUE);   /* Enable sequencer, and wait for trigger */

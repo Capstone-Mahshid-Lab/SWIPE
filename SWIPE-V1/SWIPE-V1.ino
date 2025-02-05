@@ -22,7 +22,7 @@ uint32_t  AD5940_ClrMCUIntFlag(void) {
 }
 
 void setup() {
-  attachInterrupt(digitalPinToInterrupt(INT_PIN), handleISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(INT_PIN), handleISR, FALLING);
   pinMode(BLE_LED, OUTPUT);
   digitalWrite(BLE_LED, LOW);
   Serial.begin(115200);

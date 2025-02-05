@@ -43,7 +43,7 @@ void AD5940_RstSet(void) { //AD5940 Release Reset Button
 }
 
 void AD5940_Delay10us(uint32_t time) {
-  delayMicroseconds(time/10);
+  delayMicroseconds(10*time);
 }
 
 
