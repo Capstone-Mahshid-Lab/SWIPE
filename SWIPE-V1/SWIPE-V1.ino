@@ -1,42 +1,38 @@
-#include "SPITest.hpp"
-#include "ESP32Port.hpp"
-//#include "TemperatureService.hpp"
+/*
+  Blink
 
-#define INT_PIN 17
-#define BLE_LED 21
+  Turns an LED on for one second, then off for one second, repeatedly.
 
-volatile static uint8_t ucInterrupted = 0;       /* Flag to indicate interrupt occurred */
+  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
+  it is attached to digital pin 13, on MKR1000 on pin 6. 21 is set to
+  the correct LED pin independent of which board is used.
+  If you want to know what pin the on-board LED is connected to on your Arduino
+  model, check the Technical Specs of your board at:
+  https://www.arduino.cc/en/Main/Products
 
-void handleISR() {
-  ucInterrupted = 1;
-}
+  modified 8 May 2014
+  by Scott Fitzgerald
+  modified 2 Sep 2016
+  by Arturo Guadalupi
+  modified 8 Sep 2016
+  by Colby Newman
 
-uint32_t  AD5940_GetMCUIntFlag(void) {
-  return ucInterrupted;
-}
+  This example code is in the public domain.
 
-uint32_t  AD5940_ClrMCUIntFlag(void) {
-  ucInterrupted = 0;
-	return 1;
-}
+  https://www.arduino.cc/en/Tutorial/BuiltInExamples/Blink
+*/
 
+// the setup function runs once when you press reset or power the board
 void setup() {
-  //attachInterrupt(digitalPinToInterrupt(INT_PIN), handleISR, CHANGE);
-  pinMode(BLE_LED, OUTPUT);
-  digitalWrite(BLE_LED, LOW);
-  Serial.begin(115200);
-  Serial.println("running setup");
-  init_ESP32_SPI();
-  delay(3000);
+  // initialize digital pin 21 as an output.
+  pinMode(34, INPUT_PULLUP); 
+  pinMode(21, OUTPUT);
 }
 
+// the loop function runs over and over again forever
 void loop() {
-  Serial.println("hello from arduino");
-  //SPI_LoopbackTest();
-  runSpiTest();
-  //getTemperature();
-  digitalWrite(BLE_LED, HIGH);
-  delay(500);
-  digitalWrite(BLE_LED, LOW);
-  delay(500);
+  digitalWrite(21, HIGH);  // turn the LED on (HIGH is the voltage level)
+  delay(1000);                      // wait for a second
+  digitalWrite(21, LOW);   // turn the LED off by making the voltage LOW
+  delay(1000);                      // wait for a second
 }
