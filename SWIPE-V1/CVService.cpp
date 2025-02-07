@@ -46,7 +46,7 @@ static int32_t AD5940PlatformCfg(void)
   AD5940_INTCCfg(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH|AFEINTSRC_ENDSEQ|AFEINTSRC_CUSTOMINT0, bTRUE); 
   AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
   /* Step4: Configure GPIO */
-  gpio_cfg.FuncSet = GP0_INT|GP1_SLEEP|GP2_SYNC;  /* GPIO1 indicates AFE is in sleep state. GPIO2 indicates ADC is sampling. */
+  gpio_cfg.FuncSet = GP0_INT|GP1_SYNC|GP2_PORB;  /* GPIO1 indicates AFE is in sleep state. GPIO2 indicates ADC is sampling. */
   gpio_cfg.InputEnSet = 0;
   gpio_cfg.OutputEnSet = AGPIO_Pin0|AGPIO_Pin1|AGPIO_Pin2;
   gpio_cfg.OutVal = 0;
@@ -81,8 +81,8 @@ static void AD5940RampStructInit(void)
   pRampCfg->RampPeakVolt = +1000.0f;           /* +1V */
   pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
   pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
-  pRampCfg->StepNumber = 16;                   /* Total steps. Equals to ADC sample number */
-  pRampCfg->RampDuration = 240;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
+  pRampCfg->StepNumber = 64;                   /* Total steps. Equals to ADC sample number */
+  pRampCfg->RampDuration = 3*1000;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
   pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
   pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
@@ -109,13 +109,26 @@ void runCV(void) {
 
     AppRAMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
     AppRAMPCtrl(APPCTRL_START, 0);   
-
-    AppRAMPGetCfg(&pRampCfg);
-    while (digitalRead(17) == 1) {
-      delay(1);
+    // Wait for 5 interrupts
+    int interruptCount = 0;
+    while (interruptCount < 63) {  
+        if (digitalRead(INT_PIN_GPIO1) == 0) {  
+            interruptCount++;
+        }
     }
-    getCVData(AppBuff);
-    RampShowResult((float*)AppBuff, APPBUFF_SIZE);
+
+    // Check FIFO count
+    uint32_t fifoCount = AD5940_FIFOGetCnt();
+    Serial.print("FIFO Count: ");
+    Serial.println(fifoCount);
+
+    if (fifoCount > 0) {
+        getCVData(AppBuff);
+        RampShowResult((float*)AppBuff, APPBUFF_SIZE);
+    } else {
+        Serial.println("⚠️ FIFO is still empty!");
+    }
+
     delay(10);
 }
 

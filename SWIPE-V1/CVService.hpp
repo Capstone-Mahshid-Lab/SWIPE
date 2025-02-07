@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "string.h"
 #include <Arduino.h>
+#include "ESP32Port.hpp"
 
 extern "C" {
 #include "RampTest.h"

@@ -2,8 +2,21 @@
 
 SPIClass *vspi = nullptr;
 
+volatile static uint8_t ucInterrupted = 0;       /* Flag to indicate interrupt occurred */
+
 /* MCU specific funtions used by AD5940 lib
 */
+void init_ESP32(void) {
+  //init LED and interrupt pins
+  pinMode(BLE_LED, OUTPUT);
+  digitalWrite(BLE_LED, LOW);
+  pinMode(INT_PIN_GPIO0, INPUT);
+  pinMode(INT_PIN_GPIO1, INPUT);
+
+  //init SPI
+  init_ESP32_SPI();
+}
+
 void init_ESP32_SPI(void) {
   pinMode(VSPI_SS, OUTPUT);  //VSPI SS
   digitalWrite(VSPI_SS, HIGH);
@@ -46,7 +59,18 @@ void AD5940_Delay10us(uint32_t time) {
   delayMicroseconds(time*10);
 }
 
+void handleISR(void) {
+  ucInterrupted = 1;
+}
 
+uint32_t  AD5940_GetMCUIntFlag(void) {
+  return ucInterrupted;
+}
+
+uint32_t  AD5940_ClrMCUIntFlag(void) {
+  ucInterrupted = 0;
+	return 1;
+}
 
 void SPI_LoopbackTest(void) {
     uint8_t tx_buffer[3] = {0xA5, 0x5A, 0xFF};  // Test data
