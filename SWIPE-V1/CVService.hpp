@@ -13,6 +13,7 @@ extern "C" {
 
 
 #define APPBUFF_SIZE 1024
+#define NB_SAMPLES 64
 
 void runCV(void);
 

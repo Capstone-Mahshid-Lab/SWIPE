@@ -73,7 +73,7 @@ static void AD5940RampStructInit(void)
   pRampCfg->MaxSeqLen = 1024-0x10;              /* 4kB/4 = 1024  */
   pRampCfg->RcalVal = 10000.0;                  /* 10kOhm RCAL */
   pRampCfg->ADCRefVolt = 1820.0f;               /* The real ADC reference voltage. Measure it from capacitor C12 with DMM. */
-  pRampCfg->FifoThresh = 480;                   /* Maximum value is 2kB/4-1 = 512-1. Set it to higher value to save power. */
+  pRampCfg->FifoThresh = NB_SAMPLES;    //bytes I think             /* Maximum value is 2kB/4-1 = 512-1. Set it to higher value to save power. */
   pRampCfg->SysClkFreq = 16000000.0f;           /* System clock is 16MHz by default */
   pRampCfg->LFOSCClkFreq = LFOSCFreq;           /* LFOSC frequency */
   /* Configure ramp signal parameters */
@@ -81,7 +81,7 @@ static void AD5940RampStructInit(void)
   pRampCfg->RampPeakVolt = +1000.0f;           /* +1V */
   pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
   pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
-  pRampCfg->StepNumber = 64;                   /* Total steps. Equals to ADC sample number */
+  pRampCfg->StepNumber = NB_SAMPLES;                   /* Total steps. Equals to ADC sample number */
   pRampCfg->RampDuration = 3*1000;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
   pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
@@ -96,7 +96,7 @@ static int32_t RampShowResult(float *pData, uint32_t DataCount)
   for(int i=0;i<DataCount;i++)
   {
     Serial.println(pData[i]);
-    i += 10; //skip samples to alleviate weight on UART
+    //i += 10; //skip samples to alleviate weight on UART
   }
   return 0;
 }
@@ -109,9 +109,10 @@ void runCV(void) {
 
     AppRAMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
     AppRAMPCtrl(APPCTRL_START, 0);   
-    // Wait for 5 interrupts
+
+    // Wait for n interrupts
     int interruptCount = 0;
-    while (interruptCount < 63) {  
+    while (interruptCount < NB_SAMPLES) {  
         if (digitalRead(INT_PIN_GPIO1) == 0) {  
             interruptCount++;
         }
@@ -124,7 +125,7 @@ void runCV(void) {
 
     if (fifoCount > 0) {
         getCVData(AppBuff);
-        RampShowResult((float*)AppBuff, APPBUFF_SIZE);
+        RampShowResult((float*)AppBuff, NB_SAMPLES);
     } else {
         Serial.println("⚠️ FIFO is still empty!");
     }

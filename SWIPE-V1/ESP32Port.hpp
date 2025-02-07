@@ -23,6 +23,7 @@ static const int spiClk = 1000000;  // 1 MHz
 
 void init_ESP32(void);
 void init_ESP32_SPI(void);
+void toggleLED(void);
 void handleISR(void);
 uint32_t  AD5940_GetMCUIntFlag(void);
 uint32_t  AD5940_ClrMCUIntFlag(void);

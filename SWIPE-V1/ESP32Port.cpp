@@ -7,6 +7,9 @@ volatile static uint8_t ucInterrupted = 0;       /* Flag to indicate interrupt o
 /* MCU specific funtions used by AD5940 lib
 */
 void init_ESP32(void) {
+  Serial.begin(115200);
+  Serial.println("running setup");
+
   //init LED and interrupt pins
   pinMode(BLE_LED, OUTPUT);
   digitalWrite(BLE_LED, LOW);
@@ -15,6 +18,16 @@ void init_ESP32(void) {
 
   //init SPI
   init_ESP32_SPI();
+
+  //delay to allow time to see prints on serial monitor
+  delay(3000);
+}
+
+void toggleLED(void) {
+  digitalWrite(BLE_LED, HIGH);
+  delay(500);
+  digitalWrite(BLE_LED, LOW);
+  delay(500);
 }
 
 void init_ESP32_SPI(void) {
