@@ -14,9 +14,20 @@
 
 #define AD_RST 25
 
+#define INT_PIN_GPIO0 17
+#define INT_PIN_GPIO1 16
+
+#define BLE_LED 21
+
 static const int spiClk = 1000000;  // 1 MHz
 
+void init_ESP32(void);
 void init_ESP32_SPI(void);
+void toggleLED(void);
+void handleISR(void);
+uint32_t  AD5940_GetMCUIntFlag(void);
+uint32_t  AD5940_ClrMCUIntFlag(void);
+
 
 void SPI_LoopbackTest(void);
 
