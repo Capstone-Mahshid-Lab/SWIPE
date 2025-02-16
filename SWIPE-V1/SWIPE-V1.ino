@@ -22,17 +22,32 @@
   https://www.arduino.cc/en/Tutorial/BuiltInExamples/Blink
 */
 
+void handleISR() {
+  digitalWrite(21, !digitalRead(21)); 
+}
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin 21 as an output.
-  pinMode(34, INPUT_PULLUP); 
+  pinMode(32, PULLUP); 
+  pinMode(27, PULLUP);
+  pinMode(12, PULLUP);
+  pinMode(13, PULLUP);
+
   pinMode(21, OUTPUT);
+  pinMode(22, OUTPUT);
+  
+  digitalWrite(21, HIGH);  // Turns on LED (assuming active LOW LED)
+  digitalWrite(22, HIGH);  // Turns on LED (assuming active LOW LED)
+
+  attachInterrupt(digitalPinToInterrupt(17), handleISR, RISING);
+
 }
 
 // the loop function runs over and over again forever
 void loop() {
-  digitalWrite(21, HIGH);  // turn the LED on (HIGH is the voltage level)
-  delay(1000);                      // wait for a second
-  digitalWrite(21, LOW);   // turn the LED off by making the voltage LOW
-  delay(1000);                      // wait for a second
+  // digitalWrite(21, HIGH);  // turn the LED on (HIGH is the voltage level)
+  // delay(1000);                      // wait for a second
+  // digitalWrite(21, LOW);   // turn the LED off by making the voltage LOW
+  // delay(1000);                      // wait for a second
 }
