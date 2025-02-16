@@ -29,8 +29,9 @@ Follow these steps to set up the SWIPE environment:
 ### 3. Install ESP32 Libraries  
 1. Open the Arduino IDE and install the ESP32 Espressif libraries:  
    - Follow the instructions in the **"Installing ESP32 Add-on in Arduino IDE"** section from [this guide](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/).  
-2. Once installed, select **"ESP32 Wrover Kit"** from the board dropdown menu in the Arduino IDE.  
-   ![ESP32 Wrover Kit](assets/ESP32_Wrover_Kit.jpg)  
+2. Once installed, select **"ESP32 Dev Module"** from the board dropdown menu in the Arduino IDE.  
+   Warning: selecting the wrong module can lead to undefined behavior!
+   ![ESP32 Wrover Kit](assets/selecting_ESP32_Dev_Module.PNG)  
 
 ---
 
