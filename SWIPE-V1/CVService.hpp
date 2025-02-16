@@ -13,7 +13,8 @@ extern "C" {
 
 
 #define APPBUFF_SIZE 1024
-#define NB_SAMPLES 64
+#define NB_SAMPLES 256 //maximum without ping pong is 256 steps for 4KB (256*4 commands * 4 Bytes/command=4KB)
+//more data can be sent but it requires INT0 + ping pong
 
 void runCV(void);
 

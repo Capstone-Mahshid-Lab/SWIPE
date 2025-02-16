@@ -77,16 +77,16 @@ static void AD5940RampStructInit(void)
   pRampCfg->SysClkFreq = 16000000.0f;           /* System clock is 16MHz by default */
   pRampCfg->LFOSCClkFreq = LFOSCFreq;           /* LFOSC frequency */
   /* Configure ramp signal parameters */
-  pRampCfg->RampStartVolt =  -1000.0f;           /* -1V */
-  pRampCfg->RampPeakVolt = +1000.0f;           /* +1V */
+  pRampCfg->RampStartVolt =  -200.0f;           /* -1V */
+  pRampCfg->RampPeakVolt = +500.0f;           /* +1V */
   pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
   pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
   pRampCfg->StepNumber = NB_SAMPLES;                   /* Total steps. Equals to ADC sample number */
-  pRampCfg->RampDuration = 3*1000;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
+  pRampCfg->RampDuration = 30*NB_SAMPLES;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
-  pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
+  pRampCfg->LPTIARtiaSel = LPTIARTIA_200R;       /* Maximum current decides RTIA value */
   pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
-  pRampCfg->AdcPgaGain = ADCPGA_1P5;
+  pRampCfg->AdcPgaGain = ADCPGA_1;
 }
 
 static int32_t RampShowResult(float *pData, uint32_t DataCount)
@@ -125,7 +125,7 @@ void runCV(void) {
 
     if (fifoCount > 0) {
         getCVData(AppBuff);
-        RampShowResult((float*)AppBuff, NB_SAMPLES);
+        RampShowResult((float*)AppBuff, fifoCount);
     } else {
         Serial.println("⚠️ FIFO is still empty!");
     }
