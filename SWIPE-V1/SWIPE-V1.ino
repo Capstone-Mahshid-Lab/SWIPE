@@ -8,9 +8,9 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("hello from arduino");
+  //Serial.println("hello from arduino");
   //SPI_LoopbackTest();
   //runSpiTest();
   runCV();
-  toggleLED();
+  //toggleLED();
 }
