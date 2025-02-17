@@ -15,7 +15,7 @@ Follow these steps to set up the SWIPE environment:
    ![Install silabser.inf file](assets/install_silabser.inf.jpg)  
 4. Open **Device Manager** on your Windows machine.  
    - Look under **Ports** for a device called **"Silicon Labs CP210x USB to UART Bridge"**.  
-   - Note the COM port number (e.g., COM3).  
+   - Note the COM port number (e.g., COM7).  
      ![UART bridge as a COM port](assets/uart_bridge_COM_port.jpg)  
 
 ---
@@ -29,16 +29,16 @@ Follow these steps to set up the SWIPE environment:
 ### 3. Install ESP32 Libraries  
 1. Open the Arduino IDE and install the ESP32 Espressif libraries:  
    - Follow the instructions in the **"Installing ESP32 Add-on in Arduino IDE"** section from [this guide](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/).  
-2. Once installed, select **"ESP32 Wrover Kit"** from the board dropdown menu in the Arduino IDE.  
-   ![ESP32 Wrover Kit](assets/ESP32_Wrover_Kit.jpg)  
+2. Once installed, select **"ESP32 Dev Module"** from the board dropdown menu in the Arduino IDE.  
+   ![ESP32 Dev Module](assets/ESP32_Dev_Module.jpg)  
 
 ---
 
 ### 4. Compile and Flash the Code  
 1. Open the SWIPE code in the Arduino IDE.  
-2. Make sure that ESP32 Wrover kit is selected and the right COM port is selected.
+2. Make sure that ESP32 Dev Module is selected and the right COM port is selected.
 3. Click the **"Upload"** button (top-left corner) to compile and flash the code onto the board.  
-   ![Configuration to have in Arduino IDE](assets/Selecting_ESP32_Wrover_kit.jpg)
+   ![Configuration to have in Arduino IDE](assets/Selecting_ESP32_Dev_module.jpg)
 ---
 
 ### 5. Read Data from the COM Port  
