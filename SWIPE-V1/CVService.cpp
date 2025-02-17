@@ -1,0 +1,138 @@
+#include "CVService.hpp"
+
+uint32_t AppBuff[APPBUFF_SIZE];
+float LFOSCFreq;    /* Measured LFOSC frequency */
+
+static int32_t AD5940PlatformCfg(void)
+{
+  CLKCfg_Type clk_cfg;
+  SEQCfg_Type seq_cfg;  
+  FIFOCfg_Type fifo_cfg;
+  AGPIOCfg_Type gpio_cfg;
+  LFOSCMeasure_Type LfoscMeasure;
+
+  /* Use hardware reset */
+  AD5940_HWReset();
+  AD5940_Initialize();    /* Call this right after AFE reset */
+  /* Platform configuration */
+  /* Step1. Configure clock */
+  clk_cfg.HFOSCEn = bTRUE;
+  clk_cfg.HFXTALEn = bFALSE;
+  clk_cfg.LFOSCEn = bTRUE;
+  clk_cfg.HfOSC32MHzMode = bFALSE;
+  clk_cfg.SysClkSrc = SYSCLKSRC_HFOSC;
+  clk_cfg.SysClkDiv = SYSCLKDIV_1;
+  clk_cfg.ADCCLkSrc = ADCCLKSRC_HFOSC;
+  clk_cfg.ADCClkDiv = ADCCLKDIV_1;
+  AD5940_CLKCfg(&clk_cfg);
+  /* Step2. Configure FIFO and Sequencer*/
+  /* Configure FIFO and Sequencer */
+  fifo_cfg.FIFOEn = bTRUE;           /* We will enable FIFO after all parameters configured */
+  fifo_cfg.FIFOMode = FIFOMODE_FIFO;
+  fifo_cfg.FIFOSize = FIFOSIZE_2KB;   /* 2kB for FIFO, The reset 4kB for sequencer */
+  fifo_cfg.FIFOSrc = FIFOSRC_SINC3;   /* */
+  fifo_cfg.FIFOThresh = 4;            /*  Don't care, set it by application paramter */
+  AD5940_FIFOCfg(&fifo_cfg);
+  seq_cfg.SeqMemSize = SEQMEMSIZE_4KB;  /* 4kB SRAM is used for sequencer, others for data FIFO */
+  seq_cfg.SeqBreakEn = bFALSE;
+  seq_cfg.SeqIgnoreEn = bTRUE;
+  seq_cfg.SeqCntCRCClr = bTRUE;
+  seq_cfg.SeqEnable = bFALSE;
+  seq_cfg.SeqWrTimer = 0;
+  AD5940_SEQCfg(&seq_cfg);
+  /* Step3. Interrupt controller */
+  AD5940_INTCCfg(AFEINTC_1, AFEINTSRC_ALLINT, bTRUE);   /* Enable all interrupt in INTC1, so we can check INTC flags */
+  AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
+  AD5940_INTCCfg(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH|AFEINTSRC_ENDSEQ|AFEINTSRC_CUSTOMINT0, bTRUE); 
+  AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
+  /* Step4: Configure GPIO */
+  gpio_cfg.FuncSet = GP0_INT|GP1_SYNC|GP2_PORB;  /* GPIO1 indicates AFE is in sleep state. GPIO2 indicates ADC is sampling. */
+  gpio_cfg.InputEnSet = 0;
+  gpio_cfg.OutputEnSet = AGPIO_Pin0|AGPIO_Pin1|AGPIO_Pin2;
+  gpio_cfg.OutVal = 0;
+  gpio_cfg.PullEnSet = 0;
+  AD5940_AGPIOCfg(&gpio_cfg);
+  /* Measure LFOSC frequency */
+  /**@note Calibrate LFOSC using system clock. The system clock accuracy decides measurement accuracy. Use XTAL to get better result. */
+  LfoscMeasure.CalDuration = 1000.0;  /* 1000ms used for calibration. */
+  LfoscMeasure.CalSeqAddr = 0;        /* Put sequence commands from start address of SRAM */
+  LfoscMeasure.SystemClkFreq = 16000000.0f; /* 16MHz in this firmware. */
+  AD5940_LFOSCMeasure(&LfoscMeasure, &LFOSCFreq);
+  printf("LFOSC Freq:%f\n", LFOSCFreq);
+  AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);         /*  */
+  return 0;
+}
+
+static void AD5940RampStructInit(void)
+{
+  AppRAMPCfg_Type *pRampCfg;
+  
+  AppRAMPGetCfg(&pRampCfg);
+  /* Step1: configure general parmaters */
+  pRampCfg->SeqStartAddr = 0x10;                /* leave 16 commands for LFOSC calibration.  */
+  pRampCfg->MaxSeqLen = 1024-0x10;              /* 4kB/4 = 1024  */
+  pRampCfg->RcalVal = 10000.0;                  /* 10kOhm RCAL */
+  pRampCfg->ADCRefVolt = 1820.0f;               /* The real ADC reference voltage. Measure it from capacitor C12 with DMM. */
+  pRampCfg->FifoThresh = NB_SAMPLES;    //bytes I think             /* Maximum value is 2kB/4-1 = 512-1. Set it to higher value to save power. */
+  pRampCfg->SysClkFreq = 16000000.0f;           /* System clock is 16MHz by default */
+  pRampCfg->LFOSCClkFreq = LFOSCFreq;           /* LFOSC frequency */
+  /* Configure ramp signal parameters */
+  pRampCfg->RampStartVolt =  -1000.0f;           /* -1V */
+  pRampCfg->RampPeakVolt = +1000.0f;           /* +1V */
+  pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
+  pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
+  pRampCfg->StepNumber = NB_SAMPLES;                   /* Total steps. Equals to ADC sample number */
+  pRampCfg->RampDuration = 3*1000;                 /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
+  pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
+  pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
+  pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
+  pRampCfg->AdcPgaGain = ADCPGA_1P5;
+}
+
+static int32_t RampShowResult(float *pData, uint32_t DataCount)
+{
+  static uint32_t index;
+  /* Print data*/
+  for(int i=0;i<DataCount;i++)
+  {
+    Serial.println(pData[i]);
+    //i += 10; //skip samples to alleviate weight on UART
+  }
+  return 0;
+}
+
+void runCV(void) {
+    uint32_t temp; 
+    AppRAMPCfg_Type *pRampCfg;	
+    AD5940PlatformCfg();
+    AD5940RampStructInit();
+
+    AppRAMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
+    AppRAMPCtrl(APPCTRL_START, 0);   
+
+    // Wait for n interrupts
+    int interruptCount = 0;
+    while (interruptCount < NB_SAMPLES) {  
+        if (digitalRead(INT_PIN_GPIO1) == 0) {  
+            interruptCount++;
+        }
+    }
+
+    // Check FIFO count
+    uint32_t fifoCount = AD5940_FIFOGetCnt();
+    Serial.print("FIFO Count: ");
+    Serial.println(fifoCount);
+
+    if (fifoCount > 0) {
+        getCVData(AppBuff);
+        RampShowResult((float*)AppBuff, NB_SAMPLES);
+    } else {
+        Serial.println("⚠️ FIFO is still empty!");
+    }
+
+    delay(10);
+}
+
+
+
+
