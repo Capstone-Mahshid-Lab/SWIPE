@@ -36,7 +36,7 @@ static int32_t RampShowResult(float *pData, uint32_t DataCount)
   /* Print data*/
   for(int i=0;i<DataCount;i++)
   {
-    printf("index:%d, %.3f\n", index++, pData[i]);
+    printf("%.3f\n",pData[i]);
     //i += 10;  /* Print though UART consumes too much time. */
   }
   return 0;
@@ -132,7 +132,7 @@ void AD5940RampStructInit(void)
   pRampCfg->StepNumber = 800;                   /* Total steps. Equals to ADC sample number */
   pRampCfg->RampDuration = 24*1000;            /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
-  pRampCfg->LPTIARtiaSel = LPTIARTIA_4K;       /* Maximum current decides RTIA value */
+  pRampCfg->LPTIARtiaSel = LPTIARTIA_200R;       /* Maximum current decides RTIA value */
 	pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
 	pRampCfg->AdcPgaGain = ADCPGA_1P5;
 	
@@ -141,19 +141,19 @@ void AD5940RampStructInit(void)
 
 void AD5940_Main(void)
 {
-  printf("PK here\n");
+  //printf("PK here\n");
   uint32_t temp; 
   AppRAMPCfg_Type *pRampCfg;	
   AD5940PlatformCfg();
   AD5940RampStructInit();
 
   AD5940Err error1 =AppRAMPInit(AppBuff, APPBUFF_SIZE);    /* Initialize RAMP application. Provide a buffer, which is used to store sequencer commands */
-  printf("AppRAMPInit returned error code: %d\n", error1);
+  //printf("AppRAMPInit returned error code: %d\n", error1);
   AppRAMPCtrl(APPCTRL_START, 0);
   AD5940Err error2 = AppRAMPCtrl(APPCTRL_START, 0);          /* Control IMP measurement to start. Second parameter has no meaning with this command. */
-  printf("AppRAMPCtrl returned error code: %d\n", error2);
+  //printf("AppRAMPCtrl returned error code: %d\n", error2);
 
-  printf("test\n");
+  //printf("test\n");
   while(1)
   {
     AD5940Err error3 = AppRAMPGetCfg(&pRampCfg);
@@ -161,7 +161,7 @@ void AD5940_Main(void)
     // printf("PK looping\n");
     if(AD5940_GetMCUIntFlag())
     {
-      printf("PK interrupt\n");
+      //printf("PK interrupt\n");
       AD5940_ClrMCUIntFlag();
       temp = APPBUFF_SIZE;
       AppRAMPISR(AppBuff, &temp);
@@ -170,7 +170,7 @@ void AD5940_Main(void)
 		/* Repeat Measurement continuously*/
 		if(pRampCfg->bTestFinished ==bTRUE)
 		{
-      printf("finishedddddddddddddddddddddddddd\n");
+      //printf("finishedddddddddddddddddddddddddd\n");
 			AD5940_Delay10us(200000);
 			pRampCfg->bTestFinished = bFALSE;
 			AD5940_SEQCtrlS(bTRUE);   /* Enable sequencer, and wait for trigger */
