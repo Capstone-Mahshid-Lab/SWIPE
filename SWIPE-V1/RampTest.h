@@ -27,15 +27,6 @@ Analog Devices Software License Agreement.
 /**
  * The Ramp application related paramter structure
 */
-typedef enum {
-    RAMP_STATE0 = 0,
-    RAMP_STATE1,
-    RAMP_STATE2,
-    RAMP_STATE3,
-    RAMP_STATE4,
-    RAMP_STOP
-} RampState_Type;
-
 typedef struct
 {
 /* Common configurations for all kinds of Application. */
@@ -80,11 +71,9 @@ typedef struct
   uint32_t  CurrVzeroCode;        
   BoolFlag  bDACCodeInc;          /**< Increase DAC code.  */
   BoolFlag  StopRequired;         /**< After FIFO is ready, stop the measurement sequence */
-  RampState_Type RampState;
+  enum _RampState{RAMP_STATE0 = 0, RAMP_STATE1, RAMP_STATE2, RAMP_STATE3, RAMP_STATE4, RAMP_STOP} RampState;
   BoolFlag  bRampOneDir;          /**< Ramp in a single direction, no return to start */
 }AppRAMPCfg_Type;
-
-extern AppRAMPCfg_Type AppRAMPCfg;
 
 #define APPCTRL_START          0
 #define APPCTRL_STOPNOW        1
@@ -95,6 +84,5 @@ AD5940Err AppRAMPInit(uint32_t *pBuffer, uint32_t BufferSize);
 AD5940Err AppRAMPGetCfg(void *pCfg);
 AD5940Err AppRAMPISR(void *pBuff, uint32_t *pCount);
 AD5940Err AppRAMPCtrl(uint32_t Command, void *pPara);
-void getCVData(void *pBuff);
 
 #endif
