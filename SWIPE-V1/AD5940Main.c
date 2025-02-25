@@ -34,12 +34,10 @@ bool bFinished = false;
 */
 static int32_t RampShowResult(float *pData, uint32_t DataCount)
 {
-  static uint32_t index;
-  index = index % NBSAMPLES;
   /* Print data*/
   for(int i=0;i<DataCount;i++)
   {
-    printf("index:%d, data:%.3f\n", index++, pData[i]);
+    printf("index:%d, data:%.3f\n", i, pData[i]);
     //i += 10;  /* Print though UART consumes too much time. */
   }
   return 0;
@@ -132,10 +130,10 @@ void AD5940RampStructInit(void)
   pRampCfg->RampPeakVolt = +500.0f;           /* +1V */
   pRampCfg->VzeroStart = 1300.0f;               /* 1.3V */
   pRampCfg->VzeroPeak = 1300.0f;                /* 1.3V */
-  pRampCfg->StepNumber = 800;                   /* Total steps. Equals to ADC sample number */
-  pRampCfg->RampDuration = 24*1000;            /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
+  pRampCfg->StepNumber = 400;                   /* Total steps. Equals to ADC sample number */
+  pRampCfg->RampDuration = 12*1000;            /* X * 1000, where x is total duration of ramp signal. Unit is ms. */
   pRampCfg->SampleDelay = 7.0f;                 /* 7ms. Time between update DAC and ADC sample. Unit is ms. */
-  pRampCfg->LPTIARtiaSel = LPTIARTIA_40K;       /* Maximum current decides RTIA value */
+  pRampCfg->LPTIARtiaSel = LPTIARTIA_30K;       /* Maximum current decides RTIA value */
 	pRampCfg->LPTIARloadSel = LPTIARLOAD_SHORT;
 	pRampCfg->AdcPgaGain = ADCPGA_1P5;
 	
@@ -178,7 +176,7 @@ void AD5940_Main(void)
 			pRampCfg->bTestFinished = bFALSE;
 			AD5940_SEQCtrlS(bTRUE);   /* Enable sequencer, and wait for trigger */
 			AppRAMPCtrl(APPCTRL_START, 0);  
-      break;
+      return;
 		}
   }
 }
