@@ -29,6 +29,8 @@ void setup() {
   Serial.println("running setup");
   init_ESP32_SPI();
   delay(3000);
+  Serial.println("2s");
+  delay(2000);
   digitalWrite(BLE_LED, HIGH);
   delay(500);
   AD5940_Main();
